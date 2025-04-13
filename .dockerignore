@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+auth_info_baileys
+baileys_store.json
+src/data/*
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore 
