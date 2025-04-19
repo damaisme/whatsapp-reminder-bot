@@ -35,7 +35,7 @@ COPY . .
 
 # Create necessary directories and set permissions
 RUN mkdir -p \
-    /usr/src/app/src/data \
+    /usr/src/app/data \
     /usr/src/app/auth_info_baileys \
     && chown -R node:node /usr/src/app
 
