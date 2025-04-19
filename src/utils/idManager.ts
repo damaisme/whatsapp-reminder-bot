@@ -1,13 +1,15 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const ID_FILE = path.join(process.cwd(), 'data', 'lastId.txt');
+// Use ./data for storage
+const DATA_DIR = path.join('.', 'data');
+const ID_FILE = path.join(DATA_DIR, 'lastId.txt');
 
 export class IdManager {
     static async nextId(): Promise<string> {
         try {
             // Create data directory if it doesn't exist
-            await fs.mkdir(path.dirname(ID_FILE), { recursive: true });
+            await fs.mkdir(DATA_DIR, { recursive: true });
             
             // Read current ID or start from 0
             let currentId = 0;
