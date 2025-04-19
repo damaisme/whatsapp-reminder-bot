@@ -1,7 +1,8 @@
 export interface Reminder {
     id: string;  // Now using simple incremental IDs (1-999)
     chat: string;
-    botNumber: string;
+    sender: string;    // Add this field
+    botNumber: string;  // Keep this as it's required
     message: string;
     time: number;
     created: number;

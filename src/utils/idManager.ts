@@ -1,30 +1,33 @@
-import { readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import fs from 'fs/promises';
+import path from 'path';
 
-const ID_FILE = join(__dirname, '../data/lastId.txt');
+const ID_FILE = path.join(process.cwd(), 'data', 'lastId.txt');
 
 export class IdManager {
-    private static async getLastId(): Promise<number> {
-        try {
-            const id = await readFile(ID_FILE, 'utf-8');
-            return parseInt(id) || 0;
-        } catch {
-            return 0;
-        }
-    }
-
-    private static async saveLastId(id: number): Promise<void> {
-        await writeFile(ID_FILE, id.toString());
-    }
-
     static async nextId(): Promise<string> {
-        const lastId = await this.getLastId();
-        const newId = lastId + 1;
-        
-        // Reset to 1 if we reach 999
-        const finalId = newId > 999 ? 1 : newId;
-        
-        await this.saveLastId(finalId);
-        return finalId.toString();
+        try {
+            // Create data directory if it doesn't exist
+            await fs.mkdir(path.dirname(ID_FILE), { recursive: true });
+            
+            // Read current ID or start from 0
+            let currentId = 0;
+            try {
+                const data = await fs.readFile(ID_FILE, 'utf8');
+                currentId = parseInt(data);
+            } catch (error) {
+                // File doesn't exist or other error, start from 0
+            }
+
+            // Increment ID
+            currentId++;
+
+            // Save new ID
+            await fs.writeFile(ID_FILE, currentId.toString());
+
+            return currentId.toString();
+        } catch (error) {
+            console.error('Error generating ID:', error);
+            throw error;
+        }
     }
 } 

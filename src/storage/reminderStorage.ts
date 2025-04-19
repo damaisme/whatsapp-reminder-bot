@@ -19,21 +19,21 @@ export async function saveReminder(reminder: Reminder): Promise<void> {
     await writeFile(STORAGE_FILE, JSON.stringify(reminders, null, 2))
 }
 
-export async function getReminders(chat: string, botNumber: string): Promise<Reminder[]> {
+export async function getReminders(chat: string, sender: string): Promise<Reminder[]> {
     const reminders = await loadReminders()
     return reminders.filter(r => 
         r.chat === chat && 
-        r.botNumber === botNumber && 
-        r.time > Date.now()
+        r.sender === sender && 
+        (r.cronExpression || r.time > Date.now())
     )
 }
 
-export async function removeReminder(id: string, chat: string, botNumber: string): Promise<boolean> {
+export async function removeReminder(id: string, chat: string, sender: string): Promise<boolean> {
     const reminders = await loadReminders()
     const index = reminders.findIndex(r => 
         r.id === id && 
         r.chat === chat && 
-        r.botNumber === botNumber
+        r.sender === sender
     )
     
     if (index === -1) return false

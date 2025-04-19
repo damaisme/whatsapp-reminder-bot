@@ -36,12 +36,9 @@ async function connectToWhatsApp() {
 
     store?.bind(sock.ev)
 
-    // Start the reminder checker after socket is created
-    console.log('Starting reminder checker...')
+    // Start the reminder checker
     startReminderChecker(sock)
-    console.log('Reminder checker started')
 
-    // Handle connection events
     sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect } = update
         
@@ -56,16 +53,24 @@ async function connectToWhatsApp() {
         console.log('Connection update:', update)
     })
 
-    // credentials updated -- save them
     sock.ev.on('creds.update', saveCreds)
 
-    // Handle incoming messages
+    // Update message handler with more logging
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
+        console.log('Received message update:', { type, messageCount: messages.length });
+        
         if (type === 'notify') {
             for (const message of messages) {
-                // Only process messages from your number
-                if (message.key.fromMe) {
-                    await handleMessage(sock, message, BOT_NUMBER)
+                console.log('Processing message:', {
+                    fromMe: message.key.fromMe,
+                    remoteJid: message.key.remoteJid,
+                    messageText: message.message?.conversation || message.message?.extendedTextMessage?.text
+                });
+                
+                if (sock.user?.id) {
+                    await handleMessage(sock, message, sock.user.id);
+                } else {
+                    console.error('Bot user ID not available');
                 }
             }
         }
@@ -75,4 +80,4 @@ async function connectToWhatsApp() {
 }
 
 // Start the WhatsApp connection
-connectToWhatsApp()
+connectToWhatsApp().catch(err => console.error('Error in main:', err))
